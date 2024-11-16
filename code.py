@@ -106,10 +106,10 @@ if st.button("Get Detailed Notes"):
     if youtube_link:
         transcript_text = extract_transcript_details(youtube_link)
         if transcript_text:
-            # st.write("Extracted Transcript:")  # Debugging line to check transcript extraction
-            # st.write(transcript_text)  # Debugging line to check transcript extraction
+            st.write("Extracted Transcript:")  # Debugging line to check transcript extraction
+            st.write(transcript_text)  # Debugging line to check transcript extraction
             summary = generate_gemini_content(transcript_text, prompt)
             if summary:
-                # formatted_summary = format_as_bullets(summary)
+                formatted_summary = format_as_bullets(summary)
                 st.markdown("## Detailed Notes:")
                 st.markdown(formatted_summary)
