@@ -106,7 +106,7 @@ if youtube_link:
     youtube_link = extract_youtube_link(youtube_link)
     if youtube_link:
         video_id = youtube_link.split("=")[1]
-        st.image(f"http://img.youtube.com/vi/{video_id}/0.jpg", use_column_width=True)
+        st.image(f"http://img.youtube.com/vi/{video_id}/0.jpg", use_container_width=True)
 
 if st.button("Get Detailed Notes"):
     if youtube_link:
