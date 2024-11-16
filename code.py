@@ -4,8 +4,8 @@ import os
 import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi
 
-# Configure Gemini AI
-gemini_api_key = os.getenv('GEMINI_API_KEY')
+# Access Gemini API key directly from Streamlit's secrets
+gemini_api_key = st.secrets["GEMINI_API_KEY"]
 
 
 # Prompt for generating detailed notes
