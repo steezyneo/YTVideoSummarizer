@@ -1,6 +1,5 @@
 import streamlit as st
 import re
-import os
 import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi
 
