@@ -14,48 +14,45 @@ gemini_api_key = os.getenv('GEMINI_API_KEY')
 
 # Prompt for generating detailed notes
 prompt = """
-Prompt for Note-Making Bot using GEMINI AI TOOL
 Objective:
+Generate detailed and structured notes using the transcript provided. The notes should be concise yet comprehensive, formatted for easy understanding, and presented in bullet points or organized sections. The target audience includes students, researchers, and knowledge enthusiasts looking for clear and actionable insights.
 
-The goal is to generate comprehensive notes using the Cornell Method infused with the principles of Anvinshiki. The notes should cover diverse topics relevant for knowledge acquisition, competitive exams preparation (specifically UPSC, JEE, and other technical examinations), and provide detailed explanations with relevant pictures and genuine sources for further reference.
+Guidelines for Note Creation:
+1. **Topic Segmentation**:
+   - Identify and separate key topics or themes within the transcript.
+   - Use meaningful headings and subheadings for clarity.
 
-Structure of the Notes:
-1. Topic Identification:   
+2. **Key Points Extraction**:
+   - Extract the most critical information from each section of the transcript.
+   - Summarize concepts into clear, concise bullet points.
 
-    Identify diverse topics within the domains of UPSC, JEE, and technical examinations.
-    Prioritize topics based on importance, relevance, and frequency in exams.
+3. **Provide Context**:
+   - Explain complex terms or ideas with simple examples or analogies.
+   - Add background information if needed to enhance understanding.
 
-2. Generate Overview:
+4. **Visual Appeal**:
+   - Use clear formatting with bullets, numbered lists, or tables where appropriate.
+   - Keep the text organized and easy to skim.
 
-    Provide a concise overview of each chosen topic, outlining key concepts and their applications.
-    Include the significance of the topic in competitive exams.
+5. **Actionable Insights**:
+   - Include actionable takeaways or steps the reader can implement.
+   - Highlight practical applications, if relevant.
 
-3. Detailed Explanation:
+6. **Interconnections**:
+   - Establish links between different concepts to show their relevance or interdependence.
+   - Provide examples or scenarios to illustrate these connections.
 
-    Utilize the Cornell Method to provide detailed explanations, breaking down complex concepts into simpler components.
-    Ensure clarity in understanding and emphasize foundational principles.
+7. **Sources and References**:
+   - If possible, recommend further reading or provide external references for deeper exploration.
 
-4. Visual Aids:
+Transcript:
+{{Insert Transcript Here}}
 
-    Incorporate relevant pictures, diagrams, and charts to enhance visual understanding.
-    Ensure visual aids align with the explanations and serve as effective learning tools.
-
-5. Anvinshiki Integration:
-
-    Infuse principles of Anvinshiki, emphasizing holistic understanding and interconnectedness of topics.
-    Establish relationships between different concepts to facilitate a deeper understanding.
-
-6. Sources and References:
-
-    Include genuine and reliable sources for each topic.
-    Verify and provide clickable links for further studies, ensuring accessibility and authenticity.
-
-7. Interactivity:
-
-    Foster interactivity by incorporating quizzes, questions, and prompts for self-assessment.
-    Encourage active engagement for better retention.
-
-Explain each section in great detail and use simple terms and provide a glossary for difficult terms. Articulate the matter in a user-appeasing manner and in detail with simple understanding examples.
+Expected Output:
+- Organized notes divided into headings and bullet points.
+- Clear, concise explanations with emphasis on key points.
+- Glossary or simple definitions for technical terms.
+- Actionable insights or practical applications (if applicable).
 """
 
 # Function to extract transcript details from YouTube video
