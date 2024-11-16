@@ -9,7 +9,8 @@ from youtube_transcript_api import YouTubeTranscriptApi
 load_dotenv()
 
 # Configure Gemini AI
-gemini_api_key = os.getenv('GEMINI_API_KEY')
+genai.configure(api_key=os.getenv("AIzaSyAoyNU7hAg74wuTWLckzjK4J0MERtCKndk"))
+
 
 # Prompt for generating detailed notes
 prompt = """
