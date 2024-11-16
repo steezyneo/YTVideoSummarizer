@@ -72,15 +72,6 @@ def generate_gemini_content(transcript_text, prompt):
         st.error(f"Error generating content: {e}")
         return None
 
-# Function to format the generated content into bullet points
-def format_as_bullets(text):
-    paragraphs = text.split('\n')
-    formatted_text = ""
-    for para in paragraphs:
-        if para.strip():
-            formatted_text += f"- {para.strip()}\n"
-    return formatted_text
-
 st.set_page_config(page_title="YouTube Video Summarizer", page_icon="📚", layout="wide")
 
 st.title("YouTube Transcript to Detailed Notes Converter")
@@ -109,6 +100,5 @@ if st.button("Get Detailed Notes"):
             st.write(transcript_text)  # Debugging line to check transcript extraction
             summary = generate_gemini_content(transcript_text, prompt)
             if summary:
-                formatted_summary = format_as_bullets(summary)
                 st.markdown("## Detailed Notes:")
-                st.markdown(formatted_summary)
+                st.markdown(summary)
