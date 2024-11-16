@@ -1,12 +1,8 @@
 import streamlit as st
-from dotenv import load_dotenv
 import re
 import os
 import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi
-
-# Load environment variables
-load_dotenv()
 
 # Configure Gemini AI
 gemini_api_key = os.getenv('GEMINI_API_KEY')
@@ -110,10 +106,10 @@ if st.button("Get Detailed Notes"):
     if youtube_link:
         transcript_text = extract_transcript_details(youtube_link)
         if transcript_text:
-            st.write("Extracted Transcript:")  # Debugging line to check transcript extraction
-            st.write(transcript_text)  # Debugging line to check transcript extraction
+            # st.write("Extracted Transcript:")  # Debugging line to check transcript extraction
+            # st.write(transcript_text)  # Debugging line to check transcript extraction
             summary = generate_gemini_content(transcript_text, prompt)
             if summary:
-                formatted_summary = format_as_bullets(summary)
+                # formatted_summary = format_as_bullets(summary)
                 st.markdown("## Detailed Notes:")
                 st.markdown(formatted_summary)
