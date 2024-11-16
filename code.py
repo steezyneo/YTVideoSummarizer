@@ -81,11 +81,16 @@ def generate_gemini_content(transcript_text, prompt):
 
 # Function to format the generated content into bullet points
 def format_as_bullets(text):
-    paragraphs = text.split('\n')
+    lines = text.split('\n')
     formatted_text = ""
-    for para in paragraphs:
-        if para.strip():
-            formatted_text += f"- {para.strip()}\n"
+    for line in lines:
+        line = line.strip()
+        if line:  # Skip empty lines
+            # Add a bullet only if not already present
+            if not line.startswith("- "):
+                formatted_text += f"- {line}\n"
+            else:
+                formatted_text += f"{line}\n"
     return formatted_text
 
 st.set_page_config(page_title="YouTube Video Summarizer", page_icon="📚", layout="wide")
@@ -117,5 +122,5 @@ if st.button("Get Detailed Notes"):
             summary = generate_gemini_content(transcript_text, prompt)
             if summary:
                 formatted_summary = format_as_bullets(summary)
-                st.markdown("## Detailed Notes:")
-                st.markdown(formatted_summary)
+                st.markdown("### Detailed Notes:")
+                st.markdown(formatted_summary, unsafe_allow_html=True)
