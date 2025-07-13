@@ -1,104 +1,59 @@
 import streamlit as st
-import re
-import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi
+import google.generativeai as genai
+from fpdf import FPDF
+import re
 
-# Access Gemini API key directly from Streamlit's secrets
-gemini_api_key = st.secrets["GEMINI_API_KEY"]
+# Get Gemini API key from Streamlit secrets
+gemini_api_key = st.secrets["gemini"]["api_key"]
+genai.configure(api_key=gemini_api_key)
 
+st.title("YouTube Video Summarizer with PDF Notes Export")
 
-# Prompt for generating detailed notes
-prompt = """
-Objective:
-Generate detailed and structured notes using the transcript provided. The notes should be concise yet comprehensive, formatted for easy understanding, and presented in bullet points or organized sections. The target audience includes students, researchers, and knowledge enthusiasts looking for clear and actionable insights.
+# Helper to extract video ID from URL
+def extract_video_id(url):
+    match = re.search(r"(?:v=|youtu.be/)([\w-]{11})", url)
+    return match.group(1) if match else None
 
-Guidelines for Note Creation:
-1. **Topic Segmentation**:
-   - Identify and separate key topics or themes within the transcript.
-   - Use meaningful headings and subheadings for clarity.
+# PDF export helper
+def export_pdf(summary, filename="summary.pdf"):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    for line in summary.split('\n'):
+        pdf.multi_cell(0, 10, line)
+    pdf.output(filename)
+    return filename
 
-2. **Key Points Extraction**:
-   - Extract the most critical information from each section of the transcript.
-   - Summarize concepts into clear, concise bullet points.
-
-3. **Provide Context**:
-   - Explain complex terms or ideas with simple examples or analogies.
-   - Add background information if needed to enhance understanding.
-
-4. **Visual Appeal**:
-   - Use clear formatting with bullets, numbered lists, or tables where appropriate.
-   - Keep the text organized and easy to skim.
-
-5. **Actionable Insights**:
-   - Include actionable takeaways or steps the reader can implement.
-   - Highlight practical applications, if relevant.
-
-6. **Interconnections**:
-   - Establish links between different concepts to show their relevance or interdependence.
-   - Provide examples or scenarios to illustrate these connections.
-
-7. **Sources and References**:
-   - If possible, recommend further reading or provide external references for deeper exploration.
-
-Transcript:
-{{Insert Transcript Here}}
-
-Expected Output:
-- Organized notes divided into headings and bullet points.
-- Clear, concise explanations with emphasis on key points.
-- Glossary or simple definitions for technical terms.
-- Actionable insights or practical applications (if applicable).
-"""
-
-# Function to extract transcript details from YouTube video
-def extract_transcript_details(youtube_video_url):
-    try:
-        video_id = youtube_video_url.split("=")[1]
-        transcript_text = YouTubeTranscriptApi.get_transcript(video_id)
-        transcript = " ".join([i["text"] for i in transcript_text])
-        return transcript
-    except Exception as e:
-        st.error(f"Error extracting transcript: {e}")
-        return None
-
-# Function to generate content using Gemini AI
-def generate_gemini_content(transcript_text, prompt):
-    try:
-        model = genai.GenerativeModel("gemini-pro")
-        full_prompt = prompt + "\n\nTranscript:\n" + transcript_text
-        response = model.generate_content(full_prompt)
-        return response.text
-    except Exception as e:
-        st.error(f"Error generating content: {e}")
-        return None
-
-st.set_page_config(page_title="YouTube Video Summarizer", page_icon="📚", layout="wide")
-
-st.title("YouTube Transcript to Detailed Notes Converter")
-youtube_link = st.text_input("Enter YouTube Video Link:")
-
-# Extracting YouTube video ID from the provided link
-def extract_youtube_link(youtube_link):
-    match = re.search(r"youtube\.com\/watch\?v=([^\&]+)", youtube_link)
-    if match:
-        return "https://www.youtube.com/watch?v=" + match.group(1)
+url = st.text_input("Enter YouTube Video URL:")
+if url:
+    video_id = extract_video_id(url)
+    if not video_id:
+        st.error("Invalid YouTube URL.")
     else:
-        st.error("Invalid YouTube link. Please enter a valid link.")
-        return None
-
-if youtube_link:
-    youtube_link = extract_youtube_link(youtube_link)
-    if youtube_link:
-        video_id = youtube_link.split("=")[1]
-        st.image(f"http://img.youtube.com/vi/{video_id}/0.jpg", use_container_width=True)
-
-if st.button("Get Detailed Notes"):
-    if youtube_link:
-        transcript_text = extract_transcript_details(youtube_link)
+        with st.spinner("Fetching transcript..."):
+            try:
+                transcript = YouTubeTranscriptApi.get_transcript(video_id)
+                transcript_text = " ".join([entry['text'] for entry in transcript])
+            except Exception as e:
+                st.error(f"Could not fetch transcript: {e}")
+                transcript_text = None
         if transcript_text:
-            st.write("Extracted Transcript:")  # Debugging line to check transcript extraction
-            st.write(transcript_text)  # Debugging line to check transcript extraction
-            summary = generate_gemini_content(transcript_text, prompt)
-            if summary:
-                st.markdown("## Detailed Notes:")
-                st.markdown(summary)
+            st.subheader("Transcript Preview:")
+            st.write(transcript_text[:1000] + ("..." if len(transcript_text) > 1000 else ""))
+            if st.button("Summarize with Gemini"):
+                with st.spinner("Summarizing..."):
+                    model = genai.GenerativeModel('gemini-pro')
+                    prompt = f"Summarize the following YouTube video transcript in concise notes:\n{transcript_text}"
+                    try:
+                        response = model.generate_content(prompt)
+                        summary = response.text
+                        st.subheader("Summary:")
+                        st.write(summary)
+                        # PDF export
+                        pdf_filename = f"summary_{video_id}.pdf"
+                        export_pdf(summary, pdf_filename)
+                        with open(pdf_filename, "rb") as f:
+                            st.download_button("Download Notes as PDF", f, file_name=pdf_filename, mime="application/pdf")
+                    except Exception as e:
+                        st.error(f"Gemini API error: {e}")
