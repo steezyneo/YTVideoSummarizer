@@ -12,7 +12,7 @@ import json
 gemini_api_key = st.secrets["gemini"]["api_key"]
 genai.configure(api_key=gemini_api_key)
 
-st.title("YouTube Video Summarizer with PDF Notes Export")
+st.title("YouTube Video Summarizer with AI")
 
 # Helper to extract video ID from URL
 def extract_video_id(url):
