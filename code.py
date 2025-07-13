@@ -98,7 +98,7 @@ if url:
             st.write(transcript_text[:1000] + ("..." if len(transcript_text) > 1000 else ""))
             if st.button("Summarize with Gemini"):
                 with st.spinner("Summarizing..."):
-                    model = genai.GenerativeModel('gemini-pro')
+                    model = genai.GenerativeModel('gemini-2.5-pro')
                     prompt = f"Summarize the following YouTube video transcript in concise notes:\n{transcript_text}"
                     try:
                         response = model.generate_content(prompt)
