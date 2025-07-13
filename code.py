@@ -116,6 +116,11 @@ if url:
         if transcript_text and is_html_error(transcript_text):
             st.error("YouTube/Google has blocked the transcript request (CAPTCHA or automated query detected). Please try again later or with a different video.")
             transcript_text = None
+        # Allow manual transcript upload if fetching failed
+        if not transcript_text:
+            uploaded_file = st.file_uploader("Or upload a transcript text file (TXT)", type=["txt"])
+            if uploaded_file is not None:
+                transcript_text = uploaded_file.read().decode("utf-8")
         if transcript_text:
             video_info = get_video_info(url)
             if video_info['thumbnail']:
