@@ -65,13 +65,16 @@ def vtt_to_text(vtt):
         text_lines.append(line)
     return ' '.join(text_lines)
 
-# Helper to fetch video title using yt-dlp
+# Helper to fetch video info (title and thumbnail) using yt-dlp
 
-def get_video_title(video_url):
+def get_video_info(video_url):
     ydl_opts = {'quiet': True}
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_url, download=False)
-        return info.get('title', 'summary')
+        return {
+            'title': info.get('title', 'summary'),
+            'thumbnail': info.get('thumbnail', None)
+        }
 
 # PDF export helper
 # Make sure DejaVuSans.ttf is in your project directory for Unicode support
@@ -106,6 +109,9 @@ if url:
                 except Exception as e:
                     st.error(f"Could not fetch transcript or captions: {e}")
         if transcript_text:
+            video_info = get_video_info(url)
+            if video_info['thumbnail']:
+                st.image(video_info['thumbnail'], use_column_width=True)
             st.subheader("Transcript Preview:")
             st.write(transcript_text[:1000] + ("..." if len(transcript_text) > 1000 else ""))
             if st.button("Summarize with Gemini"):
@@ -123,7 +129,7 @@ if url:
                 st.subheader("Summary:")
                 st.write(st.session_state['summary'])
                 # Use video title for PDF filename
-                video_title = get_video_title(url)
+                video_title = video_info['title']
                 safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in video_title)
                 pdf_filename = f"{safe_title}_notes.pdf"
                 export_pdf(st.session_state['summary'], pdf_filename)
