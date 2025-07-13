@@ -113,7 +113,11 @@ if url:
             if video_info['thumbnail']:
                 st.image(video_info['thumbnail'], use_column_width=True)
             st.subheader("Transcript Preview:")
-            st.write(transcript_text[:1000] + ("..." if len(transcript_text) > 1000 else ""))
+            preview_len = 1000
+            st.write(transcript_text[:preview_len] + ("..." if len(transcript_text) > preview_len else ""))
+            if len(transcript_text) > preview_len:
+                with st.expander("Read more"):
+                    st.write(transcript_text)
             if st.button("Summarize with Gemini"):
                 with st.spinner("Summarizing..."):
                     model = genai.GenerativeModel('gemini-2.5-pro')
