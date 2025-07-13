@@ -116,11 +116,8 @@ if url:
         if transcript_text and is_html_error(transcript_text):
             st.error("YouTube/Google has blocked the transcript request (CAPTCHA or automated query detected). Please try again later or with a different video.")
             transcript_text = None
-        # Allow manual transcript upload if fetching failed
         if not transcript_text:
-            uploaded_file = st.file_uploader("Or upload a transcript text file (TXT)", type=["txt"])
-            if uploaded_file is not None:
-                transcript_text = uploaded_file.read().decode("utf-8")
+            st.info("If you are repeatedly seeing this error, please wait a while or try a different network. YouTube may have temporarily blocked automated transcript requests from your IP.")
         if transcript_text:
             video_info = get_video_info(url)
             if video_info['thumbnail']:
@@ -158,5 +155,10 @@ if url:
                 export_pdf(st.session_state['summary'], pdf_filename)
                 with open(pdf_filename, "rb") as f:
                     st.download_button("Download Notes as PDF", f, file_name=pdf_filename, mime="application/pdf")
+        # Show uploader at the bottom if transcript still not available
+        if not transcript_text:
+            uploaded_file = st.file_uploader("Or upload a transcript text file (TXT)", type=["txt"])
+            if uploaded_file is not None:
+                transcript_text = uploaded_file.read().decode("utf-8")
         else:
             st.error("Could not fetch transcript or captions for this video. The video may not have accessible subtitles or captions.")
