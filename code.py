@@ -55,6 +55,11 @@ def get_captions_yt_dlp(video_url):
                 return ' '.join(text_lines)
     return None
 
+# Helper to detect HTML error responses
+
+def is_html_error(text):
+    return text.strip().lower().startswith("<html") or "<head>" in text.lower()
+
 # Helper to convert VTT to plain text
 def vtt_to_text(vtt):
     lines = vtt.splitlines()
@@ -108,6 +113,9 @@ if url:
                     transcript_text = get_captions_yt_dlp(url)
                 except Exception as e:
                     st.error(f"Could not fetch transcript or captions: {e}")
+        if transcript_text and is_html_error(transcript_text):
+            st.error("YouTube/Google has blocked the transcript request (CAPTCHA or automated query detected). Please try again later or with a different video.")
+            transcript_text = None
         if transcript_text:
             video_info = get_video_info(url)
             if video_info['thumbnail']:
