@@ -65,6 +65,14 @@ def vtt_to_text(vtt):
         text_lines.append(line)
     return ' '.join(text_lines)
 
+# Helper to fetch video title using yt-dlp
+
+def get_video_title(video_url):
+    ydl_opts = {'quiet': True}
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(video_url, download=False)
+        return info.get('title', 'summary')
+
 # PDF export helper
 # Make sure DejaVuSans.ttf is in your project directory for Unicode support
 
@@ -114,7 +122,10 @@ if url:
             if 'summary' in st.session_state:
                 st.subheader("Summary:")
                 st.write(st.session_state['summary'])
-                pdf_filename = f"summary_{video_id}.pdf"
+                # Use video title for PDF filename
+                video_title = get_video_title(url)
+                safe_title = "".join(c if c.isalnum() or c in " _-" else "_" for c in video_title)
+                pdf_filename = f"{safe_title}_notes.pdf"
                 export_pdf(st.session_state['summary'], pdf_filename)
                 with open(pdf_filename, "rb") as f:
                     st.download_button("Download Notes as PDF", f, file_name=pdf_filename, mime="application/pdf")
