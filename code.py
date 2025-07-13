@@ -6,6 +6,7 @@ import re
 import yt_dlp
 import requests
 import io
+import json
 
 # Get Gemini API key from Streamlit secrets
 gemini_api_key = st.secrets["gemini"]["api_key"]
@@ -32,8 +33,26 @@ def get_captions_yt_dlp(video_url):
         subtitles = info.get('subtitles') or info.get('automatic_captions')
         if subtitles and 'en' in subtitles:
             url = subtitles['en'][0]['url']
-            vtt = requests.get(url).text
-            return vtt
+            text = requests.get(url).text
+            # Try to parse as JSON, else treat as VTT
+            try:
+                data = json.loads(text)
+                # Extract text from JSON captions
+                events = data.get("events", [])
+                transcript = []
+                for event in events:
+                    for seg in event.get("segs", []):
+                        transcript.append(seg.get("utf8", ""))
+                return " ".join(transcript)
+            except Exception:
+                # Not JSON, treat as VTT
+                lines = text.splitlines()
+                text_lines = []
+                for line in lines:
+                    if line.strip() == '' or re.match(r'\d{2}:\d{2}:\d{2}\.\d{3}', line) or re.match(r'\d+$', line):
+                        continue
+                    text_lines.append(line)
+                return ' '.join(text_lines)
     return None
 
 # Helper to convert VTT to plain text
@@ -71,9 +90,7 @@ if url:
             except Exception:
                 # Fallback to yt-dlp
                 try:
-                    vtt = get_captions_yt_dlp(url)
-                    if vtt:
-                        transcript_text = vtt_to_text(vtt)
+                    transcript_text = get_captions_yt_dlp(url)
                 except Exception as e:
                     st.error(f"Could not fetch transcript or captions: {e}")
         if transcript_text:
