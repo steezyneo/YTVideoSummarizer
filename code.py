@@ -107,14 +107,16 @@ if url:
                     try:
                         response = model.generate_content(prompt)
                         summary = response.text
-                        st.subheader("Summary:")
-                        st.write(summary)
-                        # PDF export
-                        pdf_filename = f"summary_{video_id}.pdf"
-                        export_pdf(summary, pdf_filename)
-                        with open(pdf_filename, "rb") as f:
-                            st.download_button("Download Notes as PDF", f, file_name=pdf_filename, mime="application/pdf")
+                        st.session_state['summary'] = summary
                     except Exception as e:
                         st.error(f"Gemini API error: {e}")
+            # Always show summary and download if present in session_state
+            if 'summary' in st.session_state:
+                st.subheader("Summary:")
+                st.write(st.session_state['summary'])
+                pdf_filename = f"summary_{video_id}.pdf"
+                export_pdf(st.session_state['summary'], pdf_filename)
+                with open(pdf_filename, "rb") as f:
+                    st.download_button("Download Notes as PDF", f, file_name=pdf_filename, mime="application/pdf")
         else:
             st.error("Could not fetch transcript or captions for this video. The video may not have accessible subtitles or captions.")
