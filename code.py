@@ -114,10 +114,16 @@ if url:
                 st.image(video_info['thumbnail'], use_column_width=True)
             st.subheader("Transcript Preview:")
             preview_len = 1000
-            st.write(transcript_text[:preview_len] + ("..." if len(transcript_text) > preview_len else ""))
-            if len(transcript_text) > preview_len:
-                with st.expander("Read more"):
-                    st.write(transcript_text)
+            if 'show_full_transcript' not in st.session_state:
+                st.session_state['show_full_transcript'] = False
+            if not st.session_state['show_full_transcript']:
+                preview = transcript_text[:preview_len] + ("..." if len(transcript_text) > preview_len else "")
+                st.write(preview)
+                if len(transcript_text) > preview_len:
+                    if st.button("read more", key="read_more_btn"):
+                        st.session_state['show_full_transcript'] = True
+            else:
+                st.write(transcript_text)
             if st.button("Summarize with Gemini"):
                 with st.spinner("Summarizing..."):
                     model = genai.GenerativeModel('gemini-2.5-pro')
