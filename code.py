@@ -66,10 +66,14 @@ def vtt_to_text(vtt):
     return ' '.join(text_lines)
 
 # PDF export helper
+# Make sure DejaVuSans.ttf is in your project directory for Unicode support
+
 def export_pdf(summary, filename="summary.pdf"):
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", size=12)
+    # Add a Unicode font (DejaVuSans)
+    pdf.add_font("DejaVu", "", "DejaVuSans.ttf", uni=True)
+    pdf.set_font("DejaVu", size=12)
     for line in summary.split('\n'):
         pdf.multi_cell(0, 10, line)
     pdf.output(filename)
